@@ -3,13 +3,22 @@
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
+interface IComment {
+  id: number;
+  title: string;
+  comment: string;
+  created_At: string;
+}
+
 const Supabase = () => {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_PROJECT_URL as string,
     process.env.NEXT_PUBLIC_PROJECT_APL_KEYS as string
   );
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState<IComment[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
   const getComments = async () => {
     try {
@@ -17,21 +26,72 @@ const Supabase = () => {
       if (error) {
         throw error;
       }
-      setComments(data);
+      setComments(data as IComment[]);
     } catch (error) {
-      setError(error.message);
+      setError((error as Error).message);
     }
   };
   useEffect(() => {
     getComments();
   }, []);
 
+  const addNewComments = async () => {
+    if (!title || !content) return;
+    // const { data } = await supabase
+    //   .from("comments")
+    //   .insert({
+    //     title,
+    //     content,
+    //   })
+    //   .select("*");
+
+    // setComments((prev) => [...prev, ...(data as IComment[])]);
+    if (!title || !content) return;
+    try {
+      // 수정된 부분: insert 후 select("*") 추가
+      const { data, error } = await supabase
+        .from("comments")
+        .insert({
+          title: title,
+          comment: content,
+        })
+        .select("*"); // 이 부분 추가
+
+      if (error) {
+        throw error;
+      }
+
+      // 수정된 부분: data를 배열로 간주하도록 변경
+      setComments((prev) => [...prev, ...(data as IComment[])]);
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  };
+
   return (
     <div>
       {error && <div>Error: {error}</div>}
       {comments?.map((c) => (
-        <div key={c.id}>{c.title}</div>
+        <div key={c.id}>
+          <p>{c.title}</p>
+          <p>{c.comment}</p>
+        </div>
       ))}
+      <label htmlFor={title}>제목</label>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <label htmlFor={content}>내용</label>
+      <input
+        type="text"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      />
+      <button type="button" onClick={addNewComments}>
+        추추
+      </button>
     </div>
   );
 };
