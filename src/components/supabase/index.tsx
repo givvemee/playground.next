@@ -37,31 +37,21 @@ const Supabase = () => {
 
   const addNewComments = async () => {
     if (!title || !content) return;
-    // const { data } = await supabase
-    //   .from("comments")
-    //   .insert({
-    //     title,
-    //     content,
-    //   })
-    //   .select("*");
 
-    // setComments((prev) => [...prev, ...(data as IComment[])]);
     if (!title || !content) return;
     try {
-      // 수정된 부분: insert 후 select("*") 추가
       const { data, error } = await supabase
         .from("comments")
         .insert({
           title: title,
           comment: content,
         })
-        .select("*"); // 이 부분 추가
+        .select("*");
 
       if (error) {
         throw error;
       }
 
-      // 수정된 부분: data를 배열로 간주하도록 변경
       setComments((prev) => [...prev, ...(data as IComment[])]);
     } catch (error) {
       setError((error as Error).message);
