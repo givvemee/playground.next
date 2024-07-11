@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { createClient } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
 
 interface IComment {
   id: number;
@@ -17,12 +17,12 @@ const Supabase = () => {
   );
   const [comments, setComments] = useState<IComment[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
 
   const getComments = async () => {
     try {
-      const { data, error } = await supabase.from("comments").select();
+      const { data, error } = await supabase.from('comments').select();
       if (error) {
         throw error;
       }
@@ -41,12 +41,12 @@ const Supabase = () => {
     if (!title || !content) return;
     try {
       const { data, error } = await supabase
-        .from("comments")
+        .from('comments')
         .insert({
           title: title,
           comment: content,
         })
-        .select("*");
+        .select('*');
 
       if (error) {
         throw error;
